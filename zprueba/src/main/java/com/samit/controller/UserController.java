@@ -1,7 +1,12 @@
 package com.samit.controller;
 
+import com.samit.model.Role;
 import com.samit.model.User;
 import com.samit.service.UserService;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpSession;
 
@@ -32,7 +37,13 @@ public class UserController {
 				&& userForm.getPassword() != null && !userForm.getPassword().equals("")
 				&& userForm.getPasswordConfirm() != null && !userForm.getPasswordConfirm().equals("")
 				&& userForm.getPassword().equals(userForm.getPasswordConfirm())) {
-
+			
+			Role role = new Role();
+			role.setId(1L);
+			Set<Role> roles = new HashSet<Role>();
+			roles.add(role);
+			userForm.setRoles(roles);
+			
 			userService.add(userForm);
 			session.setAttribute("userForm", userForm);
 			return "redirect:/welcome";

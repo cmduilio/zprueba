@@ -2,8 +2,7 @@ package com.samit.service;
 
 import com.samit.model.User;
 
-public interface UserService {
-    void save(User user);
+public interface UserService extends Service<User> {
 
-    User findByUsername(String username);
+	public User getByUsername(String username);
 }

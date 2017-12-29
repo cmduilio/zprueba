@@ -1,32 +1,53 @@
 package com.samit.service;
 
-import com.samit.model.User;
-import com.samit.repository.RoleRepository;
-import com.samit.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-import java.util.HashSet;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.samit.dao.UserDao;
+import com.samit.dao.UserDaoImpl;
+import com.samit.model.User;
 
 @Service
-public class UserServiceImpl implements UserService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+public class UserServiceImpl implements UserService{
+	
+	@Autowired
+	private UserDao userDao;
 
-    @Override
-    public void save(User user) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user.setRoles(new HashSet<>(roleRepository.findAll()));
-        userRepository.save(user);
-    }
+	public void setUserDao(UserDaoImpl userDao) {
+		this.userDao = userDao;
+	}
 
-    @Override
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
+	@Transactional
+	public void add(User p) {
+		this.userDao.add(p);
+	}
+
+	@Transactional
+	public void update(User p) {
+		this.userDao.update(p);
+	}
+
+	@Transactional
+	public List<User> getList() {
+		return this.userDao.getList();
+	}
+
+	@Transactional
+	public User getById(Long id) {
+		return this.userDao.getById(id);
+	}
+
+	@Transactional
+	public void remove(int id) {
+		this.userDao.remove(id);
+	}
+	
+	@Transactional
+	public User getByUsername(String username) {
+		return this.userDao.getByUsername(username);
+	}
+
 }

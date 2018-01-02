@@ -6,7 +6,6 @@ import com.samit.service.UserService;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.servlet.http.HttpSession;
 
@@ -16,7 +15,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class UserController {
@@ -33,10 +31,9 @@ public class UserController {
 
 	@RequestMapping(value = "/registration", method = RequestMethod.POST)
 	public String registration(@ModelAttribute("userForm") User userForm, HttpSession session) {
-		if (userForm != null && userForm.getUsername() != null && !userForm.getUsername().equals("")
-				&& userForm.getPassword() != null && !userForm.getPassword().equals("")
-				&& userForm.getPasswordConfirm() != null && !userForm.getPasswordConfirm().equals("")
-				&& userForm.getPassword().equals(userForm.getPasswordConfirm())) {
+		String redirect;
+		
+		if (userRegistrationValidate(userForm)) {
 			
 			Role role = new Role();
 			role.setId(1L);
@@ -46,58 +43,63 @@ public class UserController {
 			
 			userService.add(userForm);
 			session.setAttribute("userForm", userForm);
-			return "redirect:/welcome";
+			redirect = "redirect:/welcome";
 		} else {
-			return "registration";
+			redirect = "registration";
 		}
-
+		
+		return redirect;
 	}
 
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String login(Model model, HttpSession session) {
+		String redirect;
+		
 		User userForm = (User) session.getAttribute("userForm");
 
 		if (userForm != null && userForm.getUsername() != null && !userForm.getUsername().equals("")) {
-			return "redirect:/welcome";
+			redirect = "redirect:/welcome";
+		}else {
+			model.addAttribute("userForm", new User());
+			redirect = "login";
 		}
 
-		model.addAttribute("userForm", new User());
-
-		return "login";
+		return redirect;
 	}
 
 	// Acá tenia un redirectAttributes para pasar info de una dirección a otra
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public String login(@ModelAttribute("userForm") User userForm, Model model, HttpSession session) {
+		String redirect;
+		
 		try {
 			User user = userService.getByUsername(userForm.getUsername());
-			if (user != null) {
+			if (userLoginUserValidate(user, userForm)) {
 				session.setAttribute("userForm", userForm);
 			}
+			
+			redirect = "redirect:/welcome";
 		} catch (Exception ex) {
 			model.addAttribute("error", "Your username and password is invalid.");
-			return login(model, session);
+			redirect = login(model, session);
 		}
 
-		return "redirect:/welcome";
+		return redirect;
 	}
 
 	@RequestMapping(value = { "/", "/welcome" }, method = RequestMethod.GET)
 	public String welcome(HttpSession session) {
-		String redirect;
-		User userForm = (User) session.getAttribute("userForm");
-
-		if (userForm != null && userForm.getUsername() != null && !userForm.getUsername().equals("")) {
-			redirect = "welcome";
-		} else {
-			redirect = error404(null);
-		}
-		return redirect;
+		return redirectIfLogedIn(session, "welcome");
 	}
 
 	@RequestMapping(value = { "/404" }, method = RequestMethod.GET)
 	public String error404(Model model) {
 		return "404";
+	}
+	
+	@RequestMapping(value = { "/profile" }, method = RequestMethod.GET)
+	public String profile(HttpSession session) {
+		return redirectIfLogedIn(session, "profile");
 	}
 
 	@RequestMapping(value = { "/logout" }, method = RequestMethod.GET)
@@ -106,4 +108,31 @@ public class UserController {
 		session.setAttribute("userForm", null);
 		return login(model, session);
 	}
+	
+	private String redirectIfLogedIn(HttpSession session, String redirect) {
+		User userForm = (User) session.getAttribute("userForm");
+
+		if (userForm == null) {
+			redirect = error404(null);
+		}
+		return redirect;
+	}
+
+	private boolean userRegistrationValidate(User userForm) {
+		return userForm != null && userForm.getUsername() != null && !userForm.getUsername().isEmpty()
+				&& userForm.getPassword() != null && !userForm.getPassword().isEmpty()
+				&& userForm.getPasswordConfirm() != null && !userForm.getPasswordConfirm().isEmpty()
+				&& userForm.getPassword().equals(userForm.getPasswordConfirm());
+	}
+	
+
+	private boolean userLoginUserValidate(User user, User userForm) {
+		return user != null && user.getUsername() != null && !user.getUsername().isEmpty()
+				&& user.getPassword() != null && !user.getPassword().isEmpty() 
+				&& userForm != null && userForm.getUsername() != null && !userForm.getUsername().isEmpty()
+				&& userForm.getPassword() != null && !userForm.getPassword().isEmpty()
+				&& user.getUsername().equals(userForm.getUsername())
+				&& user.getPassword().equals(userForm.getPassword());
+	}
+
 }

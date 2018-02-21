@@ -1,60 +1,69 @@
 package com.samit.model;
 
-
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "user")
+@Table(name = "USER")
 public class User {
-    private Long id;
-    private String username;
-    private String password;
-    private String passwordConfirm;
-    private Set<Role> roles;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long getId() {
-        return id;
-    }
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "USER_ID")
+	private Long id;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	@Column(name = "USERNAME")
+	private String username;
 
-    public String getUsername() {
-        return username;
-    }
+	@Column(name = "PASSWORD")
+	private String password;
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+	@Transient
+	private String passwordConfirm;
 
-    public String getPassword() {
-        return password;
-    }
+	@ManyToMany
+	@JoinTable(name = "user_role", 
+		joinColumns = @JoinColumn(name = "user_id"), 
+		inverseJoinColumns = @JoinColumn(name = "role_id"))
+	private Set<Role> roles;
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    @Transient
-    public String getPasswordConfirm() {
-        return passwordConfirm;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setPasswordConfirm(String passwordConfirm) {
-        this.passwordConfirm = passwordConfirm;
-    }
+	public String getUsername() {
+		return username;
+	}
 
-    @ManyToMany
-    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    public Set<Role> getRoles() {
-        return roles;
-    }
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getPasswordConfirm() {
+		return passwordConfirm;
+	}
+
+	public void setPasswordConfirm(String passwordConfirm) {
+		this.passwordConfirm = passwordConfirm;
+	}
+
+	public Set<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Set<Role> roles) {
+		this.roles = roles;
+	}
 }

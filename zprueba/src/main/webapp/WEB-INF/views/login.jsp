@@ -32,7 +32,6 @@
             
             <form:input path="username" type="text" class="form-control"
                    autofocus="true"/>
-            <span>${message}</span>
             
             <form:input path="password" type="password" class="form-control"/>
             <span>${error}</span>

@@ -3,8 +3,15 @@ package com.samit.controller;
 import com.samit.model.Schedule;
 import com.samit.model.User;
 import com.samit.service.ScheduleService;
+import com.samit.utils.SimpleJson;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,26 +36,39 @@ public class WelcomeController extends com.samit.controller.Controller{
 		session.setAttribute("userForm", null);
 		return LoginController.login(model, session);
 	}
-
-    @ResponseBody
+	
+	@ResponseBody
     @RequestMapping(value = "/addSchedule", method = RequestMethod.GET)
-    public String addSchedule(HttpSession session, Model model) {
+    public String addSchedule(HttpServletRequest request, HttpSession session, Model model) {
+
+        String dateString = request.getParameter("scheduleDate");
     	User userForm = (User) session.getAttribute("userForm");
-    	String result = "";
+    	SimpleJson result = new SimpleJson();
     	
-		if (userForm == null) {
-			result = Error404Controller.error404(null);
-		}else {
-	        Schedule schedule = new Schedule();
-	        Date date = new Date();
-	        schedule.setDate(date);
-	        schedule.setUser(userForm);
-	        scheduleService.add(schedule);
+		if (userForm != null) {
+		    Schedule schedule = new Schedule();
+	        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+	        if(dateString == null || dateString.isEmpty()) {
+		        result.put("noDate", "Please select a date to schedule");
+	        }else {
+		        try {
+					Date date = formatter.parse(dateString);
+					schedule.setDate(date);
+			        schedule.setUser(userForm);
+			        scheduleService.add(schedule);
+			        
+			        result.put("worked", "Success");
+		        } catch (ParseException e) {
+					// TODO Auto-generated catch block
+	
+		        	result.put("failed", "Failed");
+					e.printStackTrace();
+				}
+	        }
 	        
-	        model.addAttribute("toast", "funcionó");
 		}
 		
-        return result;
+        return result.toJson();
     }
     
     @ResponseBody

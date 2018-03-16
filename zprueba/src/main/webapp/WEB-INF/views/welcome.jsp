@@ -32,30 +32,35 @@
 			</h4>
 		</div>
 	</form:form>
-
-	<div class="form-signin">
-		<input class="form-control" type="date" value="inserte fecha" />
+	
 		<div class="form-signin">
-			<input type="submit" onclick="addSchedule()"
-				class="btn btn-lg btn-primary btn-block" value="Add Schedule" /> <input
-				type="submit" onclick="showSchedule()"
-				class="btn btn-lg btn-primary btn-block" value="Show all" />
-		</div>
-		<c:if test="${schedules != null}">
-			<table id="table" class="grid" style="width: 850px;">
-				<tr>
-					<th style="width: 100px;">Date</th>
-
-				</tr>
-				<c:forEach var="schedule" items="${schedules}">
+			<div hidden="true" id="message" class="form-signin">
+            	<span id="spanWorked">${worked}</span>
+            	<span id="spanFailed">${failed}</span>
+            	<input name="closeSpan" type="button" value="X" onClick="hideElement('#message')"/> 
+				
+			</div>
+			
+			<input id="scheduleDate" class="form-control" type="date" value="inserte fecha" />
+			<div class="form-signin">
+				<input type="button" onClick="addSchedule()" class="btn btn-lg btn-primary btn-block" value="Add Schedule"/> 
+				<input type="button" onClick="" class="btn btn-lg btn-primary btn-block" value="Show all" />
+			</div>
+			<c:if test="${schedules != null}">
+				<table id="table" class="grid" style="width: 850px;">
 					<tr>
-						<td>${schedule.date}</td>
+						<th style="width: 100px;">Date</th>
+	
 					</tr>
-				</c:forEach>
-			</table>
-		</c:if>
-	</div>
-
+					<c:forEach var="schedule" items="${schedules}">
+						<tr>
+							<td>${schedule.date}</td>
+						</tr>
+					</c:forEach>
+				</table>
+			</c:if>
+		</div>
+	
 	<!-- /container -->
 	<script
 		src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
@@ -67,20 +72,23 @@
     <script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
 
 	<script type="text/javascript">
+		function hideElement(element) {
+					$(element).hide();
+		}
+
 		function addSchedule() {
 			$.ajax({
 				url : 'addSchedule.html',
+				data: {"scheduleDate": $('#scheduleDate').val()},
 				success : function(data) {
-				}
-			});
-		}
-
-		function showSchedule() {
-			$.ajax({
-				url : 'showSchedule.html',
-				success : function(data) {
-					var table = $('#pepe').DataTable();
-					table.ajax.reload();
+					var json = JSON.parse(data);
+					if(json.noDate == null || json.noDate == ""){
+						$('#spanWorked').html(json.worked);
+						$('#spanFailed').html(json.failed);
+						$('#message').show();
+					} else {
+						alert(json.noDate);
+					}
 				}
 			});
 		}

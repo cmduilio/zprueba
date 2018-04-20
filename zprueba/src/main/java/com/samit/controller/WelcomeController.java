@@ -1,5 +1,6 @@
 package com.samit.controller;
 
+import com.google.gson.Gson;
 import com.samit.model.Schedule;
 import com.samit.model.User;
 import com.samit.service.ScheduleService;
@@ -8,6 +9,7 @@ import com.samit.utils.SimpleJson;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -76,7 +78,17 @@ public class WelcomeController extends com.samit.controller.Controller{
     public String showSchedule(HttpSession session, Model model) {
     	User userForm = (User) session.getAttribute("userForm");
     	List<Schedule> schedules = scheduleService.getAllByUser(userForm);
-    	model.addAttribute("schedules", schedules);
-    	return "";
+    	SimpleJson simpleJson = new SimpleJson();
+    	Gson gson = new Gson();
+    	simpleJson.put("schedules", gson.toJson(schedulesToDateList(schedules)));
+    	return simpleJson.toJson();
+    }
+    
+    public ArrayList<Date> schedulesToDateList(List<Schedule> schedules){
+    	ArrayList<Date> dates = new ArrayList<>();
+    	for(Schedule schedule : schedules) {
+    		dates.add(schedule.getDate());
+    	}
+    	return dates;
     }
 }

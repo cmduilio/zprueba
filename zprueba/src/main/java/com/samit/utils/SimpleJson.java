@@ -17,7 +17,9 @@ public class SimpleJson {
 		while(iterator.hasNext()) {
 			String key = iterator.next();
 			String value = map.get(key);
-			json += "\"" + key + "\":\"" + value + "\"";
+			
+			json += "\"" + key + "\":" + value;
+			
 			if(iterator.hasNext()) {
 				json += ",";
 			}

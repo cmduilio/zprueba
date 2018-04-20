@@ -17,7 +17,7 @@ public class LoginController extends com.samit.controller.Controller{
 	private UserService userService;
 	
 	
-	@RequestMapping(value = { "/", "/login" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "/login" }, method = RequestMethod.GET)
 	public static String login(Model model,HttpSession session) {
 		String redirect;
 		

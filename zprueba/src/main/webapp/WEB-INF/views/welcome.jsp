@@ -6,21 +6,23 @@
 
 <!DOCTYPE html>
 <html lang="en">
+	
+	
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-<meta name="description" content="">
-<meta name="author" content="">
-
-<title>Welcome</title>
-
-<link href="${contextPath}/resources/css/bootstrap.min.css"
-	rel="stylesheet">
-<link href="${contextPath}/resources/css/common.css" rel="stylesheet">
-
+	<title>Welcome</title>
+	
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	<meta name="description" content="">
+	<meta name="author" content="">
+		
+	<link href="${contextPath}/resources/css/bootstrap.min.css"
+		rel="stylesheet">
+	<link href="${contextPath}/resources/css/common.css" rel="stylesheet">
 </head>
+
 <body>
 	<form:form class="form-signin">
 		<div class="container">
@@ -33,6 +35,7 @@
 		</div>
 	</form:form>
 	
+	
 		<div class="form-signin">
 			<div hidden="true" id="message" class="form-signin">
             	<span id="spanWorked">${worked}</span>
@@ -44,21 +47,11 @@
 			<input id="scheduleDate" class="form-control" type="date" value="inserte fecha" />
 			<div class="form-signin">
 				<input type="button" onClick="addSchedule()" class="btn btn-lg btn-primary btn-block" value="Add Schedule"/> 
-				<input type="button" onClick="" class="btn btn-lg btn-primary btn-block" value="Show all" />
+				<input type="button" onClick="showSchedule()" class="btn btn-lg btn-primary btn-block" value="Show all" />
 			</div>
-			<c:if test="${schedules != null}">
-				<table id="table" class="grid" style="width: 850px;">
-					<tr>
-						<th style="width: 100px;">Date</th>
-	
-					</tr>
-					<c:forEach var="schedule" items="${schedules}">
-						<tr>
-							<td>${schedule.date}</td>
-						</tr>
-					</c:forEach>
-				</table>
-			</c:if>
+		</div>
+		
+		<div id="table" class="form-signin">
 		</div>
 	
 	<!-- /container -->
@@ -89,6 +82,28 @@
 					} else {
 						alert(json.noDate);
 					}
+				}
+			});
+		}
+		
+		function showSchedule() {
+			$.ajax({
+				url : 'showSchedule.html',
+				success : function(data) {
+					var pepito2 = JSON.parse(data);
+						
+					var trHTML = '';
+					
+					let html = "<table>";
+		            
+				    $.each(pepito2.schedules, function (i, item) {
+				    	html += '<tr><td>' + item + '</td></tr>';
+				    });
+					
+					html+= "</table>";
+
+					document.getElementById("table").innerHTML = html;
+				 
 				}
 			});
 		}
